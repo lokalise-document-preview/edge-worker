@@ -9,6 +9,19 @@ export async function handleRequest(request: Request): Promise<Response> {
   }
 
   const url = new URL(request.url);
+
+  if (url.pathname == '/get-lang-iso') {
+    const params = await request.json();
+
+    const langIso = await getLangIso({
+      apiToken: params.apiToken,
+      projectId: params.projectId,
+      langId: params.langId,
+    })
+
+    return new Response(JSON.stringify({langIso}));
+  }
+
   if (url.pathname == '/fetch-preview') {
     const params = await request.json();
 
@@ -18,9 +31,9 @@ export async function handleRequest(request: Request): Promise<Response> {
       filename: params.filename,
       fileformat: params.fileformat,
       langIso: params.langIso,
-    })
+    });
 
-    const unpacked =  await extractFileFromBundle(bundleUrl)
+    const unpacked =  await extractFileFromBundle(bundleUrl);
 
     const headers = new Headers();
     headers.set('Access-Control-Allow-Origin', allowOrigin);
@@ -35,6 +48,28 @@ export async function handleRequest(request: Request): Promise<Response> {
     url: ${request.url}
     request method: ${request.method}
   `);
+}
+
+interface LangIsoParams {
+  apiToken: string | null;
+  projectId: string | null;
+  langId: string | null;
+}
+
+async function getLangIso(params: LangIsoParams) {
+  const requestURL = `https://api.lokalise.com/api2/projects/${params.projectId}/languages/${params.langId}`;
+
+  const requestHeaders: HeadersInit = new Headers();
+  requestHeaders.set('Content-Type', 'application/json');
+  requestHeaders.set('x-api-token', params.apiToken ?? '');
+
+  const response = await fetch(requestURL, {
+      method: 'GET',
+      headers: requestHeaders
+  });
+
+  const payload = await response.json();
+  return payload.language?.lang_iso;
 }
 
 interface PreviewParams {
