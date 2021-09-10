@@ -1,6 +1,11 @@
 import { unzipSync } from 'fflate';
 
 const allowOrigin = 'https://app.lokalise.com';
+// 401 Wrong token
+// 403 No access rights to download
+// 404 Project or lang does not exist
+// 502 Can't access Lokalise API
+// 500 Error during preparing a preview or another exception in a handler
 
 export async function handleRequest(request: Request): Promise<Response> {
   if (request.method == 'OPTIONS') {
@@ -19,7 +24,11 @@ export async function handleRequest(request: Request): Promise<Response> {
       langId: params.langId,
     })
 
-    return new Response(JSON.stringify({langIso}));
+    const headers = new Headers();
+    headers.set('Access-Control-Allow-Origin', allowOrigin);
+    headers.set('Content-type', 'application/json');
+
+    return new Response(JSON.stringify({langIso}), {headers});
   }
 
   if (url.pathname == '/fetch-preview') {
