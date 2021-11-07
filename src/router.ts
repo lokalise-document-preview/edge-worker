@@ -1,7 +1,8 @@
 import { respondWithError } from './errors';
 import optionsController, { allowOrigin } from './controllers/options';
 import getLangIsoController from './controllers/get-lang-iso';
-import fetchPreviewController from './controllers/fetch-html-preview';
+import fetchPreviewHtmlController from './controllers/fetch-preview-html';
+import fetchPreviewDocxController from './controllers/fetch-preview-docx';
 
 export async function routeRequest(request: Request): Promise<Response> {
   if (request.method == 'OPTIONS') {
@@ -20,8 +21,17 @@ export async function routeRequest(request: Request): Promise<Response> {
       return getLangIsoController(request, headers);
     }
 
+    // Deprecated, will be removed after the browser extension new version release
     if (url.pathname == '/fetch-preview') {
-      return fetchPreviewController(request, headers);
+      return fetchPreviewHtmlController(request, headers);
+    }
+
+    if (url.pathname == '/fetch-preview-html') {
+      return fetchPreviewHtmlController(request, headers);
+    }
+
+    if (url.pathname == '/fetch-preview-docx') {
+      return fetchPreviewDocxController(request, headers);
     }
   } catch (error) {
     return respondWithError(error, headers);
