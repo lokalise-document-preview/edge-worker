@@ -8,6 +8,11 @@ export default async function fetchProjectComments(request: Request, headers: He
     };
 
     const comments = await getProjectComments(params);
+
+    if (!comments.length) {
+        return new Response(JSON.stringify({}), { headers });
+    }
+
     const keys = [...new Set(comments.map(comment => comment.key_id, comments))];
     const keys_data: any = {};
     const keys_request_page = 300;
