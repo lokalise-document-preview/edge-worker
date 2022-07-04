@@ -3,6 +3,7 @@ import optionsController, { allowOrigin } from './controllers/options';
 import getLangIsoController from './controllers/get-lang-iso';
 import fetchPreviewHtmlController from './controllers/fetch-preview-html';
 import fetchPreviewDocxController from './controllers/fetch-preview-docx';
+import fetchProjectComments from './controllers/fetch-project-comments';
 
 export async function routeRequest(request: Request): Promise<Response> {
   if (request.method == 'OPTIONS') {
@@ -32,6 +33,10 @@ export async function routeRequest(request: Request): Promise<Response> {
 
     if (url.pathname == '/fetch-preview-docx') {
       return fetchPreviewDocxController(request, headers);
+    }
+
+    if (url.pathname == '/fetch-project-comments') {
+      return fetchProjectComments(request, headers);
     }
   } catch (error) {
     return respondWithError(error, headers);
